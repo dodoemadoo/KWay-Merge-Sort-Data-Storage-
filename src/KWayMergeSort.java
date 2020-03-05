@@ -53,15 +53,36 @@ public class KWayMergeSort {
             run.close();
         }
 
-        return null;
+        return RunsFilesNames;
 }
-    void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename)
-    {
+    void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws FileNotFoundException {
+        RandomAccessFile sorted = new RandomAccessFile(Sortedfilename,"rw");
+        for (int i=0;i<10;i++)
+        {
 
+        }
     }
-    int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey)
-    {
-        return 1;
-        //?????.
-    }
+    int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
+        RandomAccessFile file = new RandomAccessFile(Sortedfilename,"r");
+        int first=0;
+        int last = (int) file.length()/8;
+        int middle ;
+
+        //Loop until found or end of list.
+        while(first <= last)
+        {
+            middle = (first + last) /2;
+            file.seek(middle*8);
+            int key = file.readInt();
+            if(key==RecordKey)
+                return middle*8;
+            else
+            {
+                if(key > RecordKey)
+                    last = middle -1;
+                else
+                    first = middle + 1;
+            }
+        }// end while
+        return -1;
 }
