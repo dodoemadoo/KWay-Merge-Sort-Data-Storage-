@@ -22,6 +22,77 @@ public class KWayMergeSort {
         }
         return -1;
     }
+
+    public static Integer[] removeTheElement(Integer[] arr, int index)
+    {
+
+        // If the array is empty
+        // or the index is not in array range
+        // return the original array
+        if (arr == null
+                || index < 0
+                || index >= arr.length) {
+
+            return arr;
+        }
+
+        // Create another array of size one less
+        Integer[] anotherArray = new Integer[arr.length - 1];
+
+        // Copy the elements except the index
+        // from original array to the other array
+        for (int i = 0, k = 0; i < arr.length; i++) {
+
+            // if the index is
+            // the removal element index
+            if (i == index) {
+                continue;
+            }
+
+            // if the index is not
+            // the removal element index
+            anotherArray[k++] = arr[i];
+        }
+
+        // return the resultant array
+        return anotherArray;
+    }
+
+    public static RandomAccessFile[] removeTheElement(RandomAccessFile[] arr, int index)
+    {
+
+        // If the array is empty
+        // or the index is not in array range
+        // return the original array
+        if (arr == null
+                || index < 0
+                || index >= arr.length) {
+
+            return arr;
+        }
+
+        // Create another array of size one less
+        RandomAccessFile[] anotherArray = new RandomAccessFile[arr.length - 1];
+
+        // Copy the elements except the index
+        // from original array to the other array
+        for (int i = 0, k = 0; i < arr.length; i++) {
+
+            // if the index is
+            // the removal element index
+            if (i == index) {
+                continue;
+            }
+
+            // if the index is not
+            // the removal element index
+            anotherArray[k++] = arr[i];
+        }
+
+        // return the resultant array
+        return anotherArray;
+    }
+
     String [] DivideInputFileIntoRuns (String Inputfilename, int runSize) throws IOException {
         int numOfRuns= 64/runSize;
         int remRecords = 64%runSize;
@@ -97,7 +168,6 @@ public class KWayMergeSort {
                 String currFileName = "Level"+levelNum+fileNum;
                 nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
-                size  -= K;
                 while (size != 0 && merge.length!=0)
                 {
                     int min = Collections.min(Arrays.asList(merge));
@@ -105,7 +175,13 @@ public class KWayMergeSort {
                     NextFile.writeInt(min);
                     try {
                         currFiles[index].skipBytes(4);
-                        merge[index] = currFiles[index].readInt();
+                        if(currFiles[index].getFilePointer() == currFiles[index].length())
+                        {
+                            removeTheElement(merge,index);
+                            removeTheElement(currFiles,index);
+                        }
+                        else
+                            merge[index] = currFiles[index].readInt();
                     }
                     catch (Exception e)
                     {
@@ -113,10 +189,13 @@ public class KWayMergeSort {
                     }
                     size--;
                 }
-
+                fileNum++;
             }
-            currLevel = (String[]) nextLevel.toArray();
+            currLevel = new String[nextLevel.size()];
+            for (int i =0; i < nextLevel.size(); i++)
+                currLevel[i] = nextLevel.get(i);
             nextLevel.clear();
+            levelNum++;
         }
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
