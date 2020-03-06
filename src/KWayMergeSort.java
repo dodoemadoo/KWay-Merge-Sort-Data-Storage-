@@ -93,7 +93,6 @@ public class KWayMergeSort {
                     currFiles[j-i] =  file;
                     merge[j-i] = file.readInt();
                     size += ((int)file.length()/8);
-                    file.close();
                 }
                 String currFileName = "Level"+levelNum+fileNum;
                 nextLevel.add(currFileName);
@@ -104,13 +103,20 @@ public class KWayMergeSort {
                     int min = Collections.min(Arrays.asList(merge));
                     int index = findIndex(merge,min) ;
                     NextFile.writeInt(min);
-                    currFiles[index].skipBytes(4);
-                    merge[index] = currFiles[index].readInt();
+                    try {
+                        currFiles[index].skipBytes(4);
+                        merge[index] = currFiles[index].readInt();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                     size--;
                 }
 
             }
             currLevel = (String[]) nextLevel.toArray();
+            nextLevel.clear();
         }
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
