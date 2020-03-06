@@ -1,14 +1,32 @@
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public class KWayMergeSort {
+    int findIndex(Integer[] arr, int t)
+    {
+        if(arr == null)
+            return  -1;
+
+        int len = arr.length;
+        int i=0;
+
+        while (i<len)
+        {
+            if (arr[i] == t){
+                return i;
+            }
+            else
+                i++;
+        }
+        return -1;
+    }
     String [] DivideInputFileIntoRuns (String Inputfilename, int runSize) throws IOException {
         int numOfRuns= 64/runSize;
+        int remRecords = 64%runSize;
+        if(remRecords != 0)
+            numOfRuns++;
         String[] fileNames = new String[numOfRuns];
         for (int i = 0;i<numOfRuns;i++)
         {
@@ -24,6 +42,8 @@ public class KWayMergeSort {
                 int offset = index.readInt();
                 run.writeInt(key);
                 run.writeInt(offset);
+                if (remRecords != 0 && i == numOfRuns-1 && j == remRecords-1 )
+                    break;
             }
             index.close();
             run.close();
@@ -55,11 +75,41 @@ public class KWayMergeSort {
 
         return RunsFilesNames;
 }
-    void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws FileNotFoundException {
+    void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws IOException {
         RandomAccessFile sorted = new RandomAccessFile(Sortedfilename,"rw");
-        for (int i=0;i<10;i++)
+        String[] currLevel = SortedRunsNames;
+        ArrayList<String> nextLevel = new ArrayList<String>();
+        int levelNum=0,fileNum=0;
+        int remFiles = SortedRunsNames.length%K;
+        while (currLevel.length!=1)
         {
+            for (int i=0;i<currLevel.length;i+=K)
+            {
+                RandomAccessFile[] currFiles  = new RandomAccessFile[K];
+                Integer[] merge = new Integer[K];
+                int size = 0 ;
+                for(int j=i ; j<K ;j++)
+                {
+                    RandomAccessFile file = new RandomAccessFile(currLevel[j],"r");
+                    currFiles[j-i] =  file;
+                    merge[j-i] = file.readInt();
+                    size += ((int)file.length()/8);
+                    file.close();
+                }
+                String currFileName = "Level"+levelNum+fileNum;
+                RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
+                size -= K;
+                while (size != 0 && merge.length!=0)
+                {
+                    int min = Collections.min(Arrays.asList(merge));
+                    int index = findIndex(merge,min) ;
+                    sorted.writeInt(min);
+                    currFiles[index].skipBytes(4);
+                    merge[index] = currFiles[index].readInt();
+                    size--;
+                }
 
+            }
         }
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {

@@ -5,7 +5,7 @@ import java.io.RandomAccessFile;
 public class Main {
     public static void main(String args[]) throws IOException {
         KWayMergeSort k = new KWayMergeSort();
-        String[] runs = k.DivideInputFileIntoRuns("Index.bin",2);
+        String[] runs = k.DivideInputFileIntoRuns("Index.bin",3);
         k.SortEachRunOnMemoryAndWriteItBack(runs);
     }
 }
