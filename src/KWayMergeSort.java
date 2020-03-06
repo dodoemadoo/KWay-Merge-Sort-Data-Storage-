@@ -177,8 +177,8 @@ public class KWayMergeSort {
                         currFiles[index].skipBytes(4);
                         if(currFiles[index].getFilePointer() == currFiles[index].length())
                         {
-                            removeTheElement(merge,index);
-                            removeTheElement(currFiles,index);
+                            merge = removeTheElement(merge,index);
+                            currFiles = removeTheElement(currFiles,index);
                         }
                         else
                             merge[index] = currFiles[index].readInt();
