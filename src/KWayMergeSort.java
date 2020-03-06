@@ -76,7 +76,6 @@ public class KWayMergeSort {
         return RunsFilesNames;
 }
     void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws IOException {
-        RandomAccessFile sorted = new RandomAccessFile(Sortedfilename,"rw");
         String[] currLevel = SortedRunsNames;
         ArrayList<String> nextLevel = new ArrayList<String>();
         int levelNum=0,fileNum=0;
@@ -97,19 +96,21 @@ public class KWayMergeSort {
                     file.close();
                 }
                 String currFileName = "Level"+levelNum+fileNum;
+                nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
-                size -= K;
+                size  -= K;
                 while (size != 0 && merge.length!=0)
                 {
                     int min = Collections.min(Arrays.asList(merge));
                     int index = findIndex(merge,min) ;
-                    sorted.writeInt(min);
+                    NextFile.writeInt(min);
                     currFiles[index].skipBytes(4);
                     merge[index] = currFiles[index].readInt();
                     size--;
                 }
 
             }
+            currLevel = (String[]) nextLevel.toArray();
         }
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
