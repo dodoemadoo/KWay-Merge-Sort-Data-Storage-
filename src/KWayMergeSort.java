@@ -93,6 +93,20 @@ public class KWayMergeSort {
         return anotherArray;
     }
 
+    void copyfile(RandomAccessFile f1,RandomAccessFile f2) throws IOException
+    {
+        int size = (int) (f1.length()/8);
+        for (int i=0;i<size;i++)
+        {
+            int key = f1.readInt();
+            int offset = f1.readInt();
+            f2.writeInt(key);
+            f2.writeInt(offset);
+        }
+        f1.close();
+        f2.close();
+    }
+
     String [] DivideInputFileIntoRuns (String Inputfilename, int runSize) throws IOException {
         int numOfRuns= 64/runSize;
         int remRecords = 64%runSize;
@@ -134,7 +148,7 @@ public class KWayMergeSort {
                 int offset = run.readInt();
                 keys.put(key,offset);
             }
-            //System.out.println(keys);
+            System.out.println(keys);
             run.seek(0);
             for (Map.Entry m:keys.entrySet())
             {
@@ -150,7 +164,6 @@ public class KWayMergeSort {
         String[] currLevel = SortedRunsNames;
         ArrayList<String> nextLevel = new ArrayList<String>();
         int levelNum=0,fileNum=0;
-        int remFiles = SortedRunsNames.length%K;
         while (currLevel.length!=1)
         {
             for (int i=0;i<currLevel.length;i+=K)
@@ -159,7 +172,6 @@ public class KWayMergeSort {
                 Integer[] merge = new Integer[K];
                 int size = 0 ;
                 int loop = K+i;
-                //System.out.println(K+i + " "+currLevel.length);
                 if(K+i>currLevel.length)
                 {
                     loop = currLevel.length;
@@ -172,17 +184,10 @@ public class KWayMergeSort {
                     currFiles[j-i] =  file;
                     merge[j-i] = file.readInt();
                     size += ((int)file.length()/8);
-                    System.out.println(file.length()/8);
                 }
                 String currFileName = "Level"+levelNum+fileNum+".bin";
                 nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
-//                if(size == 0)
-//                {
-//                    for (int o=0;o<merge.length;o++)
-//                        System.out.println(merge[o]);
-//                }
-                //System.out.println(size);
                 while (size != 0 && merge.length!=0)
                 {
                     int min = Collections.min(Arrays.asList(merge));
@@ -214,6 +219,9 @@ public class KWayMergeSort {
             levelNum++;
             fileNum = 0;
         }
+        RandomAccessFile sorted = new RandomAccessFile(Sortedfilename,"rw");
+        RandomAccessFile lastLevel = new RandomAccessFile(currLevel[0],"r");
+        copyfile(lastLevel,sorted);
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
         RandomAccessFile file = new RandomAccessFile(Sortedfilename,"r");
