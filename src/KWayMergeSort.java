@@ -163,8 +163,8 @@ public class KWayMergeSort {
                 if(K+i>currLevel.length)
                 {
                     loop = currLevel.length;
-                    currFiles = new RandomAccessFile[loop];
-                    merge = new Integer[loop];
+                    currFiles = new RandomAccessFile[currLevel.length-i];
+                    merge = new Integer[currLevel.length-i];
                 }
                 for(int j=i ; j<loop;j++)
                 {
