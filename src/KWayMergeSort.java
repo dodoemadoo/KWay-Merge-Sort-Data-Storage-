@@ -22,6 +22,91 @@ public class KWayMergeSort {
         }
         return -1;
     }
+
+    public static Integer[] removeTheElement(Integer[] arr, int index)
+    {
+
+        // If the array is empty
+        // or the index is not in array range
+        // return the original array
+        if (arr == null
+                || index < 0
+                || index >= arr.length) {
+
+            return arr;
+        }
+
+        // Create another array of size one less
+        Integer[] anotherArray = new Integer[arr.length - 1];
+
+        // Copy the elements except the index
+        // from original array to the other array
+        for (int i = 0, k = 0; i < arr.length; i++) {
+
+            // if the index is
+            // the removal element index
+            if (i == index) {
+                continue;
+            }
+
+            // if the index is not
+            // the removal element index
+            anotherArray[k++] = arr[i];
+        }
+
+        // return the resultant array
+        return anotherArray;
+    }
+
+    public static RandomAccessFile[] removeTheElement(RandomAccessFile[] arr, int index)
+    {
+
+        // If the array is empty
+        // or the index is not in array range
+        // return the original array
+        if (arr == null
+                || index < 0
+                || index >= arr.length) {
+
+            return arr;
+        }
+
+        // Create another array of size one less
+        RandomAccessFile[] anotherArray = new RandomAccessFile[arr.length - 1];
+
+        // Copy the elements except the index
+        // from original array to the other array
+        for (int i = 0, k = 0; i < arr.length; i++) {
+
+            // if the index is
+            // the removal element index
+            if (i == index) {
+                continue;
+            }
+
+            // if the index is not
+            // the removal element index
+            anotherArray[k++] = arr[i];
+        }
+
+        // return the resultant array
+        return anotherArray;
+    }
+
+    void copyfile(RandomAccessFile f1,RandomAccessFile f2) throws IOException
+    {
+        int size = (int) (f1.length()/8);
+        for (int i=0;i<size;i++)
+        {
+            int key = f1.readInt();
+            int offset = f1.readInt();
+            f2.writeInt(key);
+            f2.writeInt(offset);
+        }
+        f1.close();
+        f2.close();
+    }
+
     String [] DivideInputFileIntoRuns (String Inputfilename, int runSize) throws IOException {
         int numOfRuns= 64/runSize;
         int remRecords = 64%runSize;
@@ -70,7 +155,7 @@ public class KWayMergeSort {
             for (Map.Entry m:keys.entrySet())
             {
                 run.writeInt((Integer) m.getKey());
-                run.writeInt((Integer) m.getKey());
+                run.writeInt((Integer) m.getValue());
             }
             run.close();
         }
@@ -81,7 +166,6 @@ public class KWayMergeSort {
         String[] currLevel = SortedRunsNames;
         ArrayList<String> nextLevel = new ArrayList<String>();
         int levelNum=0,fileNum=0;
-        int remFiles = SortedRunsNames.length%K;
         while (currLevel.length!=1)
         {
             for (int i=0;i<currLevel.length;i+=K)
@@ -89,31 +173,57 @@ public class KWayMergeSort {
                 RandomAccessFile[] currFiles  = new RandomAccessFile[K];
                 Integer[] merge = new Integer[K];
                 int size = 0 ;
-                for(int j=i ; j<K ;j++)
+                int loop = K+i;
+                if(K+i>currLevel.length)
+                {
+                    loop = currLevel.length;
+                    currFiles = new RandomAccessFile[currLevel.length-i];
+                    merge = new Integer[currLevel.length-i];
+                }
+                for(int j=i ; j<loop;j++)
                 {
                     RandomAccessFile file = new RandomAccessFile(currLevel[j],"r");
                     currFiles[j-i] =  file;
                     merge[j-i] = file.readInt();
                     size += ((int)file.length()/8);
-                    file.close();
                 }
-                String currFileName = "Level"+levelNum+fileNum;
+                String currFileName = "Level"+levelNum+fileNum+".bin";
                 nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
-                size  -= K;
                 while (size != 0 && merge.length!=0)
                 {
                     int min = Collections.min(Arrays.asList(merge));
                     int index = findIndex(merge,min) ;
                     NextFile.writeInt(min);
-                    currFiles[index].skipBytes(4);
-                    merge[index] = currFiles[index].readInt();
+                    try {
+                        int offest = currFiles[index].readInt();
+                        NextFile.writeInt(offest);
+                        if(currFiles[index].getFilePointer() == currFiles[index].length())
+                        {
+                            merge = removeTheElement(merge,index);
+                            currFiles = removeTheElement(currFiles,index);
+                        }
+                        else
+                            merge[index] = currFiles[index].readInt();
+                    }
+                    catch (Exception e)
+                    {
+                        e.printStackTrace();
+                    }
                     size--;
                 }
-
+                fileNum++;
             }
-            currLevel = (String[]) nextLevel.toArray();
+            currLevel = new String[nextLevel.size()];
+            for (int i =0; i < nextLevel.size(); i++)
+                currLevel[i] = nextLevel.get(i);
+            nextLevel.clear();
+            levelNum++;
+            fileNum = 0;
         }
+        RandomAccessFile sorted = new RandomAccessFile(Sortedfilename,"rw");
+        RandomAccessFile lastLevel = new RandomAccessFile(currLevel[0],"r");
+        copyfile(lastLevel,sorted);
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
         RandomAccessFile file = new RandomAccessFile(Sortedfilename,"r");
