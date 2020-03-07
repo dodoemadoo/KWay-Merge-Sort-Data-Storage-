@@ -148,7 +148,9 @@ public class KWayMergeSort {
                 int offset = run.readInt();
                 keys.put(key,offset);
             }
-            System.out.println(keys);
+            int x=i;
+            System.out.println("Run " +(x+1) + " : " + keys);
+            
             run.seek(0);
             for (Map.Entry m:keys.entrySet())
             {
@@ -157,7 +159,7 @@ public class KWayMergeSort {
             }
             run.close();
         }
-
+        System.out.println("");
         return RunsFilesNames;
 }
     void DoKWayMergeAndWriteASortedFile(String [] SortedRunsNames, int K ,String Sortedfilename) throws IOException {
@@ -236,7 +238,7 @@ public class KWayMergeSort {
             file.seek(middle*8);
             int key = file.readInt();
             if(key==RecordKey)
-                return middle*8;
+                return file.readInt();
             else
             {
                 if(key > RecordKey)
