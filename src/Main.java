@@ -5,11 +5,11 @@ import java.io.RandomAccessFile;
 public class Main {
     public static void main(String args[]) throws IOException {
         KWayMergeSort k = new KWayMergeSort();
-        String[] runs = k.DivideInputFileIntoRuns("Index.bin",4);
+        String[] runs = k.DivideInputFileIntoRuns("Index.bin",3);
         runs = k.SortEachRunOnMemoryAndWriteItBack(runs);
-        k.DoKWayMergeAndWriteASortedFile(runs,4,"");
-//        RandomAccessFile r = new RandomAccessFile("Level10.bin","r");
-//        for (int i = 0 ;i<16;i++)
+        k.DoKWayMergeAndWriteASortedFile(runs,2,"");
+//        RandomAccessFile r = new RandomAccessFile("Level20.bin","r");
+//        for (int i = 0 ;i<24;i++)
 //        {
 //            System.out.println(i+" "+r.readInt()+" "+r.readInt());
 //        }

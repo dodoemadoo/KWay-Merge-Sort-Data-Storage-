@@ -139,7 +139,7 @@ public class KWayMergeSort {
             for (Map.Entry m:keys.entrySet())
             {
                 run.writeInt((Integer) m.getKey());
-                run.writeInt((Integer) m.getKey());
+                run.writeInt((Integer) m.getValue());
             }
             run.close();
         }
@@ -158,27 +158,39 @@ public class KWayMergeSort {
                 RandomAccessFile[] currFiles  = new RandomAccessFile[K];
                 Integer[] merge = new Integer[K];
                 int size = 0 ;
-                for(int j=i ; j<K+i  ;j++)
+                int loop = K+i;
+                //System.out.println(K+i + " "+currLevel.length);
+                if(K+i>currLevel.length)
                 {
-                    System.out.println(currLevel[j]);
+                    loop = currLevel.length;
+                    currFiles = new RandomAccessFile[loop];
+                    merge = new Integer[loop];
+                }
+                for(int j=i ; j<loop;j++)
+                {
                     RandomAccessFile file = new RandomAccessFile(currLevel[j],"r");
                     currFiles[j-i] =  file;
                     merge[j-i] = file.readInt();
                     size += ((int)file.length()/8);
+                    System.out.println(file.length()/8);
                 }
-                for (int m=0;m<merge.length;m++){
-                    System.out.print(merge[m]+" ");}
-                System.out.println();
                 String currFileName = "Level"+levelNum+fileNum+".bin";
                 nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
+//                if(size == 0)
+//                {
+//                    for (int o=0;o<merge.length;o++)
+//                        System.out.println(merge[o]);
+//                }
+                //System.out.println(size);
                 while (size != 0 && merge.length!=0)
                 {
                     int min = Collections.min(Arrays.asList(merge));
                     int index = findIndex(merge,min) ;
                     NextFile.writeInt(min);
                     try {
-                        currFiles[index].skipBytes(4);
+                        int offest = currFiles[index].readInt();
+                        NextFile.writeInt(offest);
                         if(currFiles[index].getFilePointer() == currFiles[index].length())
                         {
                             merge = removeTheElement(merge,index);
