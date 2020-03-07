@@ -8,6 +8,11 @@ public class Main {
         String[] runs = k.DivideInputFileIntoRuns("Index.bin",4);
         runs = k.SortEachRunOnMemoryAndWriteItBack(runs);
         k.DoKWayMergeAndWriteASortedFile(runs,4,"");
-
+//        RandomAccessFile r = new RandomAccessFile("Level10.bin","r");
+//        for (int i = 0 ;i<16;i++)
+//        {
+//            System.out.println(i+" "+r.readInt()+" "+r.readInt());
+//        }
+//        r.close();
     }
 }

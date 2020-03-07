@@ -134,7 +134,7 @@ public class KWayMergeSort {
                 int offset = run.readInt();
                 keys.put(key,offset);
             }
-            System.out.println(keys);
+            //System.out.println(keys);
             run.seek(0);
             for (Map.Entry m:keys.entrySet())
             {
@@ -158,14 +158,18 @@ public class KWayMergeSort {
                 RandomAccessFile[] currFiles  = new RandomAccessFile[K];
                 Integer[] merge = new Integer[K];
                 int size = 0 ;
-                for(int j=i ; j<K ;j++)
+                for(int j=i ; j<K+i  ;j++)
                 {
+                    System.out.println(currLevel[j]);
                     RandomAccessFile file = new RandomAccessFile(currLevel[j],"r");
                     currFiles[j-i] =  file;
                     merge[j-i] = file.readInt();
                     size += ((int)file.length()/8);
                 }
-                String currFileName = "Level"+levelNum+fileNum;
+                for (int m=0;m<merge.length;m++){
+                    System.out.print(merge[m]+" ");}
+                System.out.println();
+                String currFileName = "Level"+levelNum+fileNum+".bin";
                 nextLevel.add(currFileName);
                 RandomAccessFile NextFile = new RandomAccessFile(currFileName,"rw");
                 while (size != 0 && merge.length!=0)
@@ -196,6 +200,7 @@ public class KWayMergeSort {
                 currLevel[i] = nextLevel.get(i);
             nextLevel.clear();
             levelNum++;
+            fileNum = 0;
         }
     }
     int BinarySearchOnSortedFile(String Sortedfilename, int RecordKey) throws IOException {
